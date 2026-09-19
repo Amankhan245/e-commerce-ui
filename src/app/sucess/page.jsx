@@ -8,7 +8,6 @@ function SuccessContent() {
   const searchParams = useSearchParams();
 
   const [order, setOrder] = useState(null);
-
   useEffect(() => {
     const savedOrder = localStorage.getItem("lastOrder");
 
