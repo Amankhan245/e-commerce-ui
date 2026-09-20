@@ -5,199 +5,29 @@ import { useRouter } from "next/navigation";
 import CategoryCard from "@/components/CategoryCard";
 import ProductCard from "@/components/ProductCard";
 
-type Product = {
-  _id: string;
-  name: string;
-  price: number;
-  category: string;
-  image: string;
-  description?: string;
-};
+type Product = { _id: string; name: string; price: number; category: string; image: string };
+const promises = [
+  { number: "01", title: "Fast delivery", text: "From our shelf to your doorstep, quickly and carefully." },
+  { number: "02", title: "Secure payment", text: "A simple checkout with your information protected." },
+  { number: "03", title: "Easy returns", text: "Straightforward support if your plans change." },
+  { number: "04", title: "Quality finds", text: "Useful products picked for the way you really live." },
+];
 
 export default function Homepage() {
   const router = useRouter();
-
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  useEffect(() => { fetch("/api/products").then((response) => response.json()).then((data) => setProducts(data.products || [])).catch((error) => console.error("Failed to fetch products:", error)).finally(() => setLoading(false)); }, []);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch("/api/products");
-        const data = await response.json();
+  return <main className="bg-[#fffdf9] text-stone-950">
+    <section className="relative overflow-hidden border-b border-stone-200 bg-[#f7f1e8] px-5 pb-16 pt-10 sm:px-8 sm:pb-20 lg:px-12 lg:pb-24"><div className="mx-auto grid max-w-[1440px] items-center gap-12 lg:grid-cols-[.95fr_1.05fr]"><div className="relative z-10"><p className="mb-6 text-xs font-bold uppercase tracking-[0.22em] text-[#c84a31]">Curated for everyday living</p><h1 className="max-w-2xl font-serif text-5xl leading-[.95] tracking-[-0.065em] text-stone-950 sm:text-6xl lg:text-8xl">Everything you need,<br /><em className="font-normal text-[#c84a31]">all in one place.</em></h1><p className="mt-7 max-w-md text-base leading-7 text-stone-600 sm:text-lg">From everyday essentials to little upgrades, discover pieces that bring more ease to your day.</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><button onClick={() => router.push("/products")} className="rounded-full bg-stone-950 px-7 py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#e85d3f]">Shop the collection</button><button onClick={() => router.push("/categories")} className="rounded-full border border-stone-400 px-7 py-3.5 text-sm font-bold text-stone-900 transition hover:border-stone-950 hover:bg-white">Explore categories</button></div><p className="mt-10 text-xs font-semibold uppercase tracking-[0.15em] text-stone-500">New arrivals added regularly</p></div>
+      <div className="relative mx-auto h-[390px] w-full max-w-xl sm:h-[480px]"><div className="absolute inset-x-[8%] bottom-5 top-[10%] rotate-3 rounded-[2.5rem] bg-[#dfcbe7]" /><div className="absolute inset-x-[16%] bottom-0 top-[3%] -rotate-6 rounded-[2.5rem] bg-[#e85d3f]" /><div className="absolute inset-x-[12%] bottom-[6%] top-[9%] overflow-hidden rounded-[2.25rem] bg-stone-900 p-8 shadow-2xl"><div className="absolute -right-12 -top-8 h-44 w-44 rounded-full bg-[#f1c66d]" /><div className="absolute -bottom-12 -left-8 h-40 w-40 rounded-full bg-[#b8c7a0]" /><div className="relative flex h-full flex-col justify-between"><p className="text-xs font-bold uppercase tracking-[0.2em] text-stone-300">The Aman edit</p><div><p className="max-w-[12rem] font-serif text-4xl leading-none tracking-tight text-white sm:text-5xl">Good things, made easy.</p><div className="mt-6 flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-full bg-[#fffdf9] text-sm font-black text-stone-950">AM</span><span className="text-xs font-bold uppercase tracking-widest text-stone-300">Since 2025</span></div></div></div></div></div>
+    </div></section>
 
-        if (response.ok) {
-          setProducts(data.products);
-        }
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    <section className="px-5 py-16 sm:px-8 lg:px-12 lg:py-24"><div className="mx-auto max-w-[1440px]"><div className="flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-[#c84a31]">Browse by mood</p><h2 className="mt-3 font-serif text-4xl tracking-[-0.05em] sm:text-5xl">Find your everyday favorite.</h2></div><button onClick={() => router.push("/categories")} className="w-fit text-sm font-bold text-stone-900 underline decoration-[#e85d3f] decoration-2 underline-offset-8">See all categories</button></div><div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{["Fashion", "Electronics", "Home", "Accessories"].map((name) => <CategoryCard key={name} name={name} />)}</div></div></section>
 
-    fetchProducts();
-  }, []);
+    <section className="border-y border-stone-200 bg-white px-5 py-16 sm:px-8 lg:px-12 lg:py-24"><div className="mx-auto max-w-[1440px]"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-[#c84a31]">The shop</p><h2 className="mt-3 font-serif text-4xl tracking-[-0.05em] sm:text-5xl">Featured finds.</h2></div><button onClick={() => router.push("/products")} className="w-fit rounded-full border border-stone-900 px-5 py-2.5 text-sm font-bold transition hover:bg-stone-950 hover:text-white">View all products</button></div>{loading ? <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{[1, 2, 3, 4].map((key) => <div key={key} className="aspect-[4/5] animate-pulse rounded-[1.5rem] bg-stone-100" />)}</div> : products.length ? <div className="mt-10 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">{products.slice(0, 8).map((product) => <ProductCard key={product._id} productId={product._id} name={product.name} price={product.price} image={product.image} category={product.category} />)}</div> : <div className="mt-10 rounded-[1.5rem] bg-[#f7f1e8] p-12 text-center"><p className="font-serif text-3xl">The collection is coming soon.</p><p className="mt-2 text-sm text-stone-600">Products will appear here when they are added.</p></div>}</div></section>
 
-  return (
-    <main className="min-h-screen bg-white text-gray-900">
-
-      {/* Hero Section */}
-      <section className="border-b bg-gradient-to-br from-gray-50 via-white to-gray-100 px-6 py-16 sm:px-8 sm:py-20 lg:py-24">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-12 lg:flex-row">
-
-          <div className="max-w-2xl text-center lg:text-left">
-            <span className="inline-block rounded-full bg-black px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white">
-              Welcome to AmanMart
-            </span>
-
-            <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-              Everything you need,
-              <span className="block text-gray-500">
-                all in one place.
-              </span>
-            </h1>
-
-            <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-gray-600 sm:text-lg lg:mx-0">
-              Discover quality products at amazing prices. Shop fashion,
-              electronics, home essentials and more.
-            </p>
-
-            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
-              <button
-                onClick={() => router.push("/products")}
-                className="rounded-xl bg-black px-7 py-3.5 font-semibold text-white shadow-lg transition duration-200 hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-xl"
-              >
-                Shop Now ?
-              </button>
-
-              <button
-                onClick={() => router.push("/categories")}
-                className="rounded-xl border border-gray-300 bg-white px-7 py-3.5 font-semibold text-gray-900 transition duration-200 hover:bg-gray-100"
-              >
-                Explore Categories
-              </button>
-            </div>
-          </div>
-
-          <div className="flex h-64 w-64 shrink-0 items-center justify-center rounded-[2rem] bg-black shadow-2xl sm:h-72 sm:w-72 lg:h-80 lg:w-80">
-            <div className="text-center text-white">
-              <div className="text-7xl">???</div>
-              <p className="mt-4 text-sm font-semibold tracking-widest">
-                SHOP SMART
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="px-6 py-16 sm:px-8 lg:py-20">
-        <div className="mx-auto max-w-6xl">
-
-          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-widest text-gray-500">
-                Explore
-              </p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-                Shop by Category
-              </h2>
-            </div>
-
-            <p className="max-w-md text-sm leading-6 text-gray-500">
-              Find the products you need across our popular categories.
-            </p>
-          </div>
-
-          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <CategoryCard name="Fashion" />
-            <CategoryCard name="Electronics" />
-            <CategoryCard name="Home" />
-            <CategoryCard name="Accessories" />
-          </div>
-
-        </div>
-      </section>
-
-      {/* Featured Products */}
-      <section className="bg-gray-50 px-6 py-16 sm:px-8 lg:py-20">
-        <div className="mx-auto max-w-6xl">
-
-          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-widest text-gray-500">
-                Our Collection
-              </p>
-
-              <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-                Featured Products
-              </h2>
-            </div>
-
-            <button
-              onClick={() => router.push("/products")}
-              className="w-fit font-semibold text-gray-700 transition hover:text-black"
-            >
-              View All ?
-            </button>
-          </div>
-
-          {loading ? (
-            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {[1, 2, 3, 4].map((item) => (
-                <div
-                  key={item}
-                  className="h-80 animate-pulse rounded-2xl bg-gray-200"
-                />
-              ))}
-            </div>
-          ) : products.length === 0 ? (
-            <div className="mt-10 rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center">
-              <p className="font-semibold text-gray-700">
-                No products available.
-              </p>
-              <p className="mt-2 text-sm text-gray-500">
-                Products will appear here once they are added.
-              </p>
-            </div>
-          ) : (
-            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {products.map((product) => (
-                <ProductCard
-                  key={product._id}
-                  name={product.name}
-                  price={product.price}
-                  image={product.image}
-                />
-              ))}
-            </div>
-          )}
-
-        </div>
-      </section>
-
-      {/* Bottom CTA */}
-      <section className="px-6 py-16 sm:px-8">
-        <div className="mx-auto max-w-6xl rounded-3xl bg-black px-6 py-12 text-center text-white sm:px-12">
-          <h2 className="text-3xl font-bold sm:text-4xl">
-            Ready to start shopping?
-          </h2>
-
-          <p className="mx-auto mt-4 max-w-xl text-gray-300">
-            Explore our products and find something you will love.
-          </p>
-
-          <button
-            onClick={() => router.push("/products")}
-            className="mt-7 rounded-xl bg-white px-7 py-3.5 font-semibold text-black transition hover:bg-gray-200"
-          >
-            Browse Products
-          </button>
-        </div>
-      </section>
-
-    </main>
-  );
+    <section className="bg-[#e85d3f] px-5 py-16 sm:px-8 lg:px-12 lg:py-24"><div className="mx-auto max-w-[1440px]"><div className="max-w-2xl"><p className="text-xs font-bold uppercase tracking-[0.2em] text-[#ffddd5]">The AmanMart promise</p><h2 className="mt-3 font-serif text-4xl tracking-[-0.05em] text-white sm:text-6xl">Why shop with AmanMart?</h2></div><div className="mt-12 grid border-t border-[#f28a73] sm:grid-cols-2 lg:grid-cols-4">{promises.map((promise) => <div key={promise.number} className="border-b border-[#f28a73] py-7 pr-6 sm:border-r sm:px-6 lg:first:pl-0 lg:last:border-r-0"><p className="text-sm font-bold text-[#ffddd5]">{promise.number}</p><h3 className="mt-10 text-xl font-black text-white">{promise.title}</h3><p className="mt-3 text-sm leading-6 text-[#ffddd5]">{promise.text}</p></div>)}</div></div></section>
+  </main>;
 }

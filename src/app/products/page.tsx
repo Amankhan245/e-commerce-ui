@@ -2,12 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useCart } from "@/context/CartContext";
+import { useSearchParams } from "next/navigation";
+
+type Product = {
+  _id: string;
+  name: string;
+  price: number;
+  category: string;
+  image: string;
+  description?: string;
+};
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState([]);
-  const [quantities, setQuantities] = useState({});
-  const [addedProduct, setAddedProduct] = useState(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [addedProduct, setAddedProduct] = useState<string | null>(null);
   const { addToCart } = useCart();
+  const searchParams = useSearchParams();
+  const searchTerm = searchParams.get("search")?.trim().toLowerCase() || "";
 
   useEffect(() => {
     fetch("/api/products")
@@ -20,14 +32,14 @@ export default function ProductsPage() {
       });
   }, []);
 
-  const handleQuantity = (id, change) => {
+  const handleQuantity = (id: string, change: number) => {
     setQuantities((prev) => ({
       ...prev,
       [id]: Math.max(1, (prev[id] || 1) + change),
     }));
   };
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = (product: Product) => {
     const quantity = quantities[product._id] || 1;
 
     addToCart({
@@ -45,6 +57,10 @@ export default function ProductsPage() {
     }, 1500);
   };
 
+  const visibleProducts = products.filter((product) =>
+    !searchTerm || [product.name, product.category, product.description || ""].some((value) => value.toLowerCase().includes(searchTerm))
+  );
+
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="mx-auto w-full max-w-6xl">
@@ -52,11 +68,13 @@ export default function ProductsPage() {
           Our Products
         </h1>
 
-        {products.length === 0 ? (
+        {searchTerm && <p className="-mt-5 mb-5 text-sm text-gray-600">Showing results for <span className="font-semibold text-gray-900">&ldquo;{searchParams.get("search")}&rdquo;</span></p>}
+
+        {visibleProducts.length === 0 ? (
           <p className="text-gray-600">No products found.</p>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {products.map((product) => {
+            {visibleProducts.map((product) => {
               const quantity = quantities[product._id] || 1;
 
               return (
@@ -64,11 +82,11 @@ export default function ProductsPage() {
                   key={product._id}
                   className="overflow-hidden rounded-xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                 >
-                  <div className="flex h-28 items-center justify-center bg-gray-100">
+                  <div className="h-64 w-full overflow-hidden bg-gray-100">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="h-[30px] w-[30px] object-contain"
+                      className="h-full w-full object-cover"
                     />
                   </div>
 
