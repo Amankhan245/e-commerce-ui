@@ -220,3 +220,4 @@ BCA Student | Web Developer
 ## License
 
 This project is created for learning and portfolio purposes.
+pnpm update next
